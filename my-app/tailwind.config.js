@@ -1,0 +1,22 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./src/**/*.{html,js,svelte,ts}",
+  ],
+  theme: {
+    colors: {
+      transparent: 'transparent',
+      current: 'currentColor',
+      'white': '#ffffff',
+      'bgColor': '#436268',
+      'textColor': '#F4FBF8',
+      'CTA':'#2E5157',
+      'CTA-Hover':'#778E91',
+      'Card-Background' : '#31565E'
+          
+    },
+    extend: {},
+  },
+  plugins: [],
+}
+
