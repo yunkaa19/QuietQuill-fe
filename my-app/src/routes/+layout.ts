@@ -3,6 +3,11 @@ import { browser} from "$app/environment";
 import { onAuthStateChanged } from "firebase/auth";
 
 
+export const ssr = true
+export const csr = true
+export const prerender = false
+
+
 
 export async function load({ url}){
     if(browser){

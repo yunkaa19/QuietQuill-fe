@@ -56,16 +56,26 @@
 </script>
 
 
-<div class="login-form">
-    <h1>Login</h1>
-    <form on:submit={loginWithMail}>
-        <input bind:value={email} type="text" placeholder="Email" />
-        <input bind:value={password} type="password" placeholder="Password" />
-        <button type="submit">Login</button>
-    </form>
-
-    <div>or</div>
-
-    <button on:click={loginWithGoogle}>Login with Google</button>
-    <div>Don't you have an account? <a href="/register"> Register</a></div>
+<div class="flex flex-col items-center justify-center min-h-screen bg-bgColor text-textColor">
+    <h1 class="mb-8 text-4xl font-bold">Login</h1>
+    <div class="w-full max-w-sm p-8 space-y-8 bg-white rounded-lg shadow-md">
+        <form class="space-y-6" on:submit|preventDefault={loginWithMail}>
+            <input class="w-full p-4 text-lg text-bgColor text-gray-700 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                   bind:value={email} type="email" placeholder="Email" required />
+            <input class="w-full p-4 text-lg text-bgColor text-gray-700 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                   bind:value={password} type="password" placeholder="Password" required />
+            <button class="w-full p-4 text-lg font-semibold text-white bg-CTA rounded-md hover:bg-CTA-Hover"
+                    type="submit">Login</button>
+        </form>
+        <div class="text-sm text-center text-bgColor">or</div>
+        <button class="text-bgColor flex items-center justify-center w-full p-4 font-semibold text-gray-700 bg-white rounded-md shadow hover:shadow-md"
+                on:click={loginWithGoogle}>
+            <img src="src/lib/images/google.svg" alt="Google logo" class="w-6 h-6 mr-3">
+            Login with Google
+        </button>
+        <div class="text-center text-bgColor">
+            Don't you have an account?
+            <a href="/register" class="font-semibold text-CTA hover:text-CTA-Hover">Register</a>
+        </div>
+    </div>
 </div>
