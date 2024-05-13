@@ -29,7 +29,7 @@ jobs:
         context: ./my-app
         file: ./my-app/Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/quietquill-fe:latest
+        tags: yunka19/quietquill-fe:latest
 
     - name: Logout from Docker Hub
       if: always()
