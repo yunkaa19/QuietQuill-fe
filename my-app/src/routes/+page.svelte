@@ -34,6 +34,6 @@
         <h2>Get Started</h2>
         <p>Join our community to start your wellness journey.</p>
         <!-- You can replace the href with your actual sign-up or contact page -->
-        <a on:click={gotoSignUp()}>Sign Up Today</a>
+<!--        <a on:click={gotoSignUp()}>Sign Up Today</a>-->
     </div>
 </main>

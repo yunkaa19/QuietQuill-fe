@@ -1,60 +1,14 @@
 <script lang="ts">
-    import { session } from '$lib/session';
-    import { auth } from '$lib/firebase.client';
-    import {
-        GoogleAuthProvider,
-        signInWithPopup,
-        createUserWithEmailAndPassword,
-        type UserCredential
-    } from 'firebase/auth';
-    import { goto } from '$app/navigation';
+    
 
     let email: string = '';
     let password: string = '';
 
     async function registerWithEmail() {
-        await createUserWithEmailAndPassword(auth, email, password)
-            .then((result) => {
-                const { user }: UserCredential = result;
-                session.set({
-                    loggedIn: true,
-                    user: {
-                        displayName: user?.displayName,
-                        email: user?.email,
-                        photoURL: user?.photoURL,
-                        uid: user?.uid
-                    }
-                });
-                goto('/');
-            })
-            .catch((error) => {
-                return error;
-            });
+        
     }
 
-    async function registerWithGoogle() {
-        const provider = new GoogleAuthProvider();
-        await signInWithPopup(auth, provider)
-            .then((result) => {
-                const { user } = result;
-                session.update((cur: any) => {
-                    return {
-                        ...cur,
-                        loggedIn: true,
-                        user: {
-                            displayName: user?.displayName,
-                            email: user?.email,
-                            photoURL: user?.photoURL,
-                            uid: user?.uid
-                        }
-                    };
-                });
-                goto('/');
-            })
-            .catch((error) => {
-                return error;
-            });
-    }
+    
 </script>
 
 <div class="flex flex-col items-center justify-center min-h-screen bg-bgColor text-textColor">
@@ -70,7 +24,7 @@
         </form>
         <div class="text-sm text-center text-bgColor">or</div>
         <button class="text-bgColor flex items-center justify-center w-full p-4 font-semibold text-gray-700 bg-white rounded-md shadow hover:shadow-md"
-                on:click={registerWithGoogle}>
+                on:click={registerWithEmail}>
             <img src="src/lib/images/google.svg" alt="Google logo" class="w-6 h-6 mr-3">
             Register with Google
         </button>

@@ -2,11 +2,11 @@
     import { writable } from 'svelte/store';
 
     export let currentDate = new Date();
-    type entry = { time: string, description: string };
-    let entries = writable<entry[]>([]);
+    type Entry = { time: string, description: string };
+    let entries = writable<Entry[]>([]);
 
     // Placeholder function to simulate fetching entries for a day
-    function loadEntriesForDay(date : Date) {
+    function loadEntriesForDay(date: Date) {
         entries.set([
             { time: '09:00', description: 'Morning Meditation' },
             { time: '12:00', description: 'Lunch with Team' },
@@ -28,24 +28,23 @@
     }
 </script>
 
-<div class="day-navigation">
-    <button on:click={prevDay}>&lt; Prev Day</button>
-    <span>{currentDate.toDateString()}</span>
-    <button on:click={nextDay}>Next Day &gt;</button>
+<div class="day-navigation flex items-center justify-between p-4 bg-bgColor text-textColor mb-4 rounded-lg shadow-md">
+    <button class="px-4 py-2 rounded bg-CTA hover:bg-CTA-Hover focus:outline-none focus:ring-2 focus:ring-CTA-Hover" on:click={prevDay}>&lt; Prev Day</button>
+    <span class="font-bold">{currentDate.toDateString()}</span>
+    <button class="px-4 py-2 rounded bg-CTA hover:bg-CTA-Hover focus:outline-none focus:ring-2 focus:ring-CTA-Hover" on:click={nextDay}>Next Day &gt;</button>
 </div>
 
-<div class="day-entries">
-    <h2>Entries for {currentDate.toDateString()}</h2>
+<div class="day-entries p-4 bg-white rounded-lg shadow-md">
+    <h2 class="text-xl font-bold mb-4">Entries for {currentDate.toDateString()}</h2>
     {#each $entries as entry}
-        <div class="entry">
-            <span class="time">{entry.time}</span> - <span class="description">{entry.description}</span>
+        <div class="entry p-2 bg-gray-100 rounded-lg mb-2">
+            <span class="time font-bold">{entry.time}</span> - <span class="description">{entry.description}</span>
         </div>
     {/each}
 </div>
 
 <style>
     .day-navigation {
-        text-align: center;
         margin-bottom: 20px;
     }
     .entry {

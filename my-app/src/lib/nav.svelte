@@ -1,18 +1,26 @@
 <script lang="ts">
+    import { onDestroy } from 'svelte';
     import { goto } from '$app/navigation';
-    
-    export let loggedIn: boolean;
-    
+    import { session } from "$lib/session";
+
     let isSidebarExpanded = false;
+    let loggedIn: boolean = false;
+
+    const unsubscribe = session.subscribe((cur: any) => {
+        loggedIn = cur?.loggedIn;
+    });
 
     function toggleSidebar() {
         isSidebarExpanded = !isSidebarExpanded;
     }
-    
+
     function navigateTo(route: string) {
         goto("/"+route);
     }
 
+    onDestroy(() => {
+        unsubscribe();
+    });
 </script>
 
 <!-- Sidebar Container -->

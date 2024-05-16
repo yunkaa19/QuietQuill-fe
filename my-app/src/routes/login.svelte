@@ -1,18 +1,20 @@
 <script>
     import { onMount } from 'svelte';
-    import { login, isAuthenticated } from '$lib/firebase.js';
+    import { goto } from '$app/navigation';
+    import { session } from '$lib/session';
+    import {getToken} from "$lib/Components/Api/Auth.js";
 
     let loading = true;
 
     onMount(async () => {
-        const isLoggedIn = await isAuthenticated();
-        if (!isLoggedIn) {
-            login();
-        } else {
-            // Redirect to the user's dashboard or profile
-            // This could be a SvelteKit navigation or simply setting window.location
+        if ( getToken() !== null ) {
+            session.set({loggedIn: true, user: null, loading: false});
+            goto('/');
         }
-        loading = false;
+        else    {
+            session.set({loggedIn: false, user: null, loading: false});
+            goto('/login');
+        }
     });
 </script>
 

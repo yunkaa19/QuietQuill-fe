@@ -33,13 +33,11 @@
     }
 </script>
 
-
 <div class="journal-page bg-gray-100 min-h-screen flex flex-col items-center justify-center py-8">
-    <div class="calendar-container bg-white shadow-lg p-4 rounded-lg mb-6">
+    <div class="calendar-container bg-white shadow-lg p-6 rounded-lg mb-6 w-full max-w-5xl">
         <Calendar {selectedDate} on:dateChange={handleDateChange} />
     </div>
 </div>
-
 
 <style>
     .journal-page {
@@ -48,13 +46,12 @@
     }
 
     .calendar-container {
-        width: 300px;
-        /* additional styling */
+        width: 100%;
+        max-width: 5xl;
     }
 
     .journal-entries {
         flex-grow: 1;
         margin-left: 2rem;
-        /* additional styling */
     }
 </style>
