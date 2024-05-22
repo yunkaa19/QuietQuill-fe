@@ -1,9 +1,8 @@
 <script lang="ts">
     import { writable } from 'svelte/store';
     import { goto } from '$app/navigation';
-    import { login } from '$lib/Components/Api/Users/Users';
-    import { setToken } from '$lib/Components/Api/Auth';
-    import { session } from '$lib/session'; // Ensure you have session management
+    import { login } from '$lib/Components/Api/Users/login';
+    import { user } from '$lib/stores/session';
 
     let email: string = '';
     let password: string = '';
@@ -11,17 +10,13 @@
 
     async function loginWithMail() {
         try {
-            const token = await login({ email, password });
-            setToken(token);
-            session.set({
-                loggedIn: true,
-                user: {
-                    email,
-                }
-            });
-            goto('/');
+            const userData = await login({ email, password });
+            user.set(userData);  // Store user data in the user store
+            await goto('/');
         } catch (error) {
-            errorMessage.set(error.message);
+            console.error('LoginWithMail error:', error);
+            const typedError = error as Error;
+            errorMessage.set(typedError.message);
         }
     }
 </script>
@@ -41,7 +36,6 @@
             <p class="text-red-500 text-sm">{$errorMessage}</p>
         {/if}
         <div class="text-sm text-center text-bgColor">or</div>
-        <!-- Remove Google login for now -->
         <div class="text-center text-bgColor">
             Don't you have an account?
             <a href="/register" class="font-semibold text-CTA hover:text-CTA-Hover">Register</a>

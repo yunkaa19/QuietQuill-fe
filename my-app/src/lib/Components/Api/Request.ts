@@ -1,4 +1,4 @@
-const BASE_URL = 'http://localhost:5103'; //TODO: Adjust this
+const BASE_URL = 'http://localhost:5103'; // TODO: Adjust this
 
 interface RequestOptions {
     method: string;
@@ -7,10 +7,10 @@ interface RequestOptions {
 }
 
 export async function request<T>(endpoint: string, method: string, data?: any, rawResponse: boolean = false): Promise<T> {
-    const token = localStorage.getItem('authToken'); 
+    const token = localStorage.getItem('authToken');
     const headers = new Headers({
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`, 
+        'Authorization': token ? `Bearer ${token}` : '', // Ensure token is only included if it exists
     });
 
     const config: RequestOptions = {
@@ -21,11 +21,13 @@ export async function request<T>(endpoint: string, method: string, data?: any, r
 
     try {
         const response = await fetch(`${BASE_URL}/${endpoint}`, config);
+        const responseData = await (rawResponse ? response.text() : response.json());
+
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'API request failed');
+            throw new Error(responseData.message || 'API request failed');
         }
-        return rawResponse ? (await response.text()) as unknown as T : await response.json();
+
+        return responseData as T;
     } catch (error) {
         console.error('API request error:', error);
         throw error;

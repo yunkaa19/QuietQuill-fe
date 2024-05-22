@@ -1,20 +1,19 @@
-import { session} from "$lib/session";
-
-
-export function getToken(): string | null {
-    return localStorage.getItem('authToken');
+interface User {
+    Token: string;
+    UserId: string;
+    Email: string;
+    Role: string;
 }
 
-export function setToken(token: string): void {
-    localStorage.setItem('authToken', token);
+export function getToken(): User | null {
+    const userString = localStorage.getItem('user');
+    return userString ? JSON.parse(userString) : null;
+}
+
+export function setToken(user: User): void {
+    localStorage.setItem('user', JSON.stringify(user));
 }
 
 export function clearToken(): void {
-    session.set({
-        loggedIn: false,
-        user: {
-            email: '',
-        }
-    });
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
 }

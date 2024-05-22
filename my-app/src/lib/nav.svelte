@@ -1,26 +1,19 @@
 <script lang="ts">
-    import { onDestroy } from 'svelte';
     import { goto } from '$app/navigation';
-    import { session } from "$lib/session";
+    import { loggedIn } from '$lib/stores/session';
 
     let isSidebarExpanded = false;
-    let loggedIn: boolean = false;
+    let isLoggedIn: boolean;
 
-    const unsubscribe = session.subscribe((cur: any) => {
-        loggedIn = cur?.loggedIn;
-    });
+    $: $loggedIn, isLoggedIn = $loggedIn;
 
     function toggleSidebar() {
         isSidebarExpanded = !isSidebarExpanded;
     }
 
     function navigateTo(route: string) {
-        goto("/"+route);
+        goto("/" + route);
     }
-
-    onDestroy(() => {
-        unsubscribe();
-    });
 </script>
 
 <!-- Sidebar Container -->
@@ -43,51 +36,52 @@
             </svg>
             <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>Home</span>
         </button>
-        {#if loggedIn}
-        <!-- Account Button -->
-        <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={() => navigateTo("Profile")}>
-            <!-- Account Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6" style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-            </svg>
-            <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>Account</span>
-        </button>
 
-        <!-- Journal Button -->
-        <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={() => navigateTo("journals")}>
-            <!-- Journal Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6" style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
-        </svg>
-            <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>Journal</span>
-        </button>
-        
-        <!-- Habit tracker Button -->
-        <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={() => navigateTo("habits")}>
-            <!-- Habit tracker Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6" style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-        </svg>
-            <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>Habit Tracker</span>
-        </button>
-        
-        <!-- Alerts Button -->
-        <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={() => navigateTo("reminders")}>
-            <!-- Alerts Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6" style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
-                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-            </svg>
-            <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>Alerts</span>
-        </button>
-        
-        <!-- Meditation Button -->
-        <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={() => navigateTo("meditation")}>
-            <!-- Meditation Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6" style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
-            </svg>
-            <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>Meditation</span>
-        </button>
+        {#if isLoggedIn}
+            <!-- Account Button -->
+            <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={() => navigateTo("Profile")}>
+                <!-- Account Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6" style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+                <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>Account</span>
+            </button>
+
+            <!-- Other logged in buttons (e.g., Journals, Habit Tracker, etc.) -->
+            <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={() => navigateTo("journals")}>
+                <!-- Journal Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6" style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                </svg>
+                <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>Journal</span>
+            </button>
+
+            <!-- Habit tracker Button -->
+            <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={() => navigateTo("habits")}>
+                <!-- Habit tracker Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6" style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                </svg>
+                <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>Habit Tracker</span>
+            </button>
+
+            <!-- Alerts Button -->
+            <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={() => navigateTo("reminders")}>
+                <!-- Alerts Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6" style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                </svg>
+                <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>Alerts</span>
+            </button>
+
+            <!-- Meditation Button -->
+            <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={() => navigateTo("meditation")}>
+                <!-- Meditation Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6" style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z" />
+                </svg>
+                <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>Meditation</span>
+            </button>
         {/if}
         <!-- Emergency Resources Button -->
         <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={() => navigateTo("emergency")}>
@@ -109,25 +103,24 @@
             <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>About</span>
         </button>
 
-
-        {#if loggedIn == false}
-        <!-- log in Button -->
-        <button class="flex justify-center items-center  h-12 w-full px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click = {() => navigateTo("login")}>
-            <!-- log in Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6" style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
-            </svg>
-            <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>Log In</span>
-        </button>
-            {:else}
-        <!-- log out Button -->
-        <button class="flex justify-center items-center w-full h-12  px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={() => navigateTo("logout")}>
-            <!-- log out Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6" style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
-            </svg>
-            <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>Log Out</span>
-        </button>
+        {#if isLoggedIn}
+        <!-- Log Out Button -->
+            <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={() => navigateTo("logout")}>
+                <!-- Log Out Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6" style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
+                </svg>
+                <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>Log Out</span>
+            </button>
+        {:else}
+            <!-- Log In Button -->
+            <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={() => navigateTo("login")}>
+                <!-- Log In Icon -->
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6" style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+                </svg>
+                <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>Log In</span>
+            </button>
         {/if}
     </nav>
 </div>
