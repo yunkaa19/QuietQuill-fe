@@ -1,4 +1,4 @@
-const BASE_URL = 'localhost:8080'; //TODO: Adjust this
+const BASE_URL = 'localhost:5103'; //TODO: Adjust this
 
 interface RequestOptions {
     method: string;

@@ -46,6 +46,12 @@ user.subscribe(value => {
 });
 
 export const loggedIn = derived(user, $user => $user !== null);
+export const token = derived(user, $user => $user?.Token);
+export const userId = derived(user, $user => $user?.UserId);
+export const email = derived(user, $user => $user?.Email);
+export const role = derived(user, $user => $user?.Role);
+
+
 
 export const login = (userData: User) => {
     user.set(userData);

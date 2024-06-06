@@ -1,20 +1,40 @@
 <script lang="ts">
     import { getWeekGrid } from '$lib/Components/Calendar/calendarUtils.js';
     import { writable } from 'svelte/store';
+    import { getJournalEntries } from '$lib/Components/Api/Journal/GetJournalEntries';
 
     export let currentDate = new Date();
     let weekGrid = writable([]);
 
-    $: weekGrid.set(getWeekGrid(currentDate));
+    async function loadEntriesForWeek(date: Date) {
+        const userId = 'd5ce285b-d7a9-454d-ad9b-67938e8cd860'; // Replace with actual user ID
+        const month = (date.getMonth() + 1).toString();
+        const year = date.getFullYear().toString();
+
+        try {
+            const response = await getJournalEntries({ userId, month, year });
+            // Process and display the entries for the week
+            // Assume getWeekGrid returns a grid of days with entries
+            const weekEntries = getWeekGrid(date).map(day => ({
+                ...day,
+                entries: response.journals.filter(entry => new Date(entry.year, entry.month - 1, entry.day).toDateString() === day.date.toDateString())
+            }));
+            weekGrid.set(weekEntries);
+        } catch (error) {
+            console.error('Error fetching journal entries:', error);
+        }
+    }
+
+    $: loadEntriesForWeek(currentDate);
 
     function nextWeek() {
         currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 7);
-        weekGrid.set(getWeekGrid(currentDate));
+        loadEntriesForWeek(currentDate);
     }
 
     function prevWeek() {
         currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() - 7);
-        weekGrid.set(getWeekGrid(currentDate));
+        loadEntriesForWeek(currentDate);
     }
 </script>
 
@@ -31,7 +51,11 @@
     {#each $weekGrid as day}
         <div class="day p-4 bg-white rounded-lg shadow-md">
             <span class="date font-bold">{day.date.toLocaleDateString()}</span>
-            <!-- Display journal entries or "+" button -->
+            {#each day.entries as entry}
+                <div class="entry p-2 bg-gray-100 rounded-lg mb-2">
+                    <span class="time font-bold">{entry.time}</span> - <span class="description">{entry.description}</span>
+                </div>
+            {/each}
         </div>
     {/each}
 </div>

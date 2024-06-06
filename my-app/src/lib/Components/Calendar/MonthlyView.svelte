@@ -1,6 +1,9 @@
 <script lang="ts">
-    import { getMonthGrid } from '$lib/Components/Calendar/calendarUtils';
+    import { createEventDispatcher } from 'svelte';
     import { writable } from 'svelte/store';
+    import { getJournalEntries } from '$lib/Components/Api/Journal/GetJournalEntries';
+    import { user } from '$lib/stores/session';
+    import { getMonthGrid } from '$lib/Components/Calendar/calendarUtils';
 
     export let currentDate = new Date();
 
@@ -8,25 +11,75 @@
     type WeekInfo = DayInfo[];
 
     let monthGrid = writable<WeekInfo[]>([]);
+    let currentUser: any = null;
 
-    $: monthGrid.set(getMonthGrid(currentDate));
+    user.subscribe(value => {
+        currentUser = value;
+    });
+
+    const dispatch = createEventDispatcher<{ addEntryClick: Date; entryClick: string }>();
+
+    async function loadEntriesForMonth(date: Date) {
+        if (!currentUser) {
+            console.error('User not loaded');
+            return;
+        }
+
+        const userId = currentUser.UserId;
+        const month = (date.getMonth() + 1).toString();
+        const year = date.getFullYear().toString();
+
+        try {
+            const response = await getJournalEntries({ userId, month, year });
+            const monthEntries = getMonthGrid(date).map(week => week.map(day => {
+                const entry = response.journals.find(entry =>
+                    new Date(parseInt(entry.year), parseInt(entry.month) - 1, parseInt(entry.day)).toDateString() === day.date.toDateString()
+                );
+                return {
+                    ...day,
+                    entryId: entry ? entry.id : undefined
+                };
+            }));
+            monthGrid.set(monthEntries);
+        } catch (error) {
+            console.error('Error fetching journal entries:', error);
+        }
+    }
+
+    function debounce(func: (...args: any[]) => void, wait: number) {
+        let timeout: NodeJS.Timeout;
+        return function(this: any, ...args: any[]) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+    const debouncedLoadEntriesForMonth = debounce(loadEntriesForMonth, 300);
+
+    $: debouncedLoadEntriesForMonth(currentDate);
 
     function nextMonth() {
         currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
         monthGrid.set(getMonthGrid(currentDate));
+        debouncedLoadEntriesForMonth(currentDate);
     }
 
     function prevMonth() {
         currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
         monthGrid.set(getMonthGrid(currentDate));
+        debouncedLoadEntriesForMonth(currentDate);
     }
 
-    function handleEntryClick(entryId: string) {
-        dispatch('entryClick', entryId);
+    function handleEntryClick(entryId: string | undefined) {
+        if (entryId) {
+            dispatch('entryClick', entryId);
+        }
     }
 
     function handleAddEntryClick(date: Date) {
-        dispatch('addEntryClick', date);
+        // Set time components to zero to avoid time zone offset issues
+        const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
+        dispatch('addEntryClick', normalizedDate);
     }
 </script>
 

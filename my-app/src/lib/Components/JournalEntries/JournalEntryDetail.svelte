@@ -4,7 +4,6 @@
     import { page } from '$app/stores';
     import { writable } from 'svelte/store';
 
-    // Define the JournalDTO type
     interface JournalDTO {
         id: string;
         userId?: string;
@@ -16,11 +15,10 @@
         tags?: string;
     }
 
-    let journalEntry = writable<JournalDTO>(null);
+    let journalEntry = writable<JournalDTO | null>(null);
     let isEditing = writable(false);
     let errorMessage = writable('');
 
-    // Get the journal ID from the URL
     $: journalId = $page.url.searchParams.get('id');
 
     onMount(async () => {
@@ -31,8 +29,12 @@
             }
             const data = await response.json();
             journalEntry.set(data);
-        } catch (error) {
-            errorMessage.set(error.message);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                errorMessage.set(error.message || 'An unexpected error occurred');
+            } else {
+                errorMessage.set('An unexpected error occurred');
+            }
         }
     });
 
@@ -42,13 +44,23 @@
 
     async function handleSubmit() {
         const entry = $journalEntry;
+        if (!entry) {
+            errorMessage.set('Journal entry is null');
+            return;
+        }
+
+        const payload = {
+            ...entry,
+            id: entry.id || '' // Ensure id is always a string
+        };
+
         try {
-            const response = await fetch(`YOUR_BACKEND_URL/journals/${entry.id}`, {
+            const response = await fetch(`YOUR_BACKEND_URL/journals/${payload.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(entry),
+                body: JSON.stringify(payload),
             });
 
             if (!response.ok) {
@@ -57,8 +69,12 @@
 
             isEditing.set(false);
             goto('/journals');
-        } catch (error) {
-            errorMessage.set(error.message);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                errorMessage.set(error.message || 'An unexpected error occurred');
+            } else {
+                errorMessage.set('An unexpected error occurred');
+            }
         }
     }
 </script>
@@ -112,8 +128,8 @@
                 {/if}
 
                 <div class="flex justify-end">
-                    <button type="submit" class="px-4 py-2 bg-CTA text-white rounded hover:bg-CTA-Hover focus:outline-none focus:ring-2 focus:ring-CTA-Hover focus:ring-opacity-50" disabled={$isSubmitting}>
-                        {#if $isSubmitting} Submitting... {:else} Save Changes {/if}
+                    <button type="submit" class="px-4 py-2 bg-CTA text-white rounded hover:bg-CTA-Hover focus:outline-none focus:ring-2 focus:ring-CTA-Hover focus:ring-opacity-50">
+                        Save Changes
                     </button>
                 </div>
             </form>

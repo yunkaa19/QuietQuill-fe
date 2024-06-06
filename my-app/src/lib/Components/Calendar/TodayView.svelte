@@ -1,18 +1,23 @@
 <script lang="ts">
     import { writable } from 'svelte/store';
+    import { getJournalEntries } from '$lib/Components/Api/Journal/GetJournalEntries';
 
     export let currentDate = new Date();
     type Entry = { time: string, description: string };
     let entries = writable<Entry[]>([]);
 
-    // Placeholder function to simulate fetching entries for a day
-    function loadEntriesForDay(date: Date) {
-        entries.set([
-            { time: '09:00', description: 'Morning Meditation' },
-            { time: '12:00', description: 'Lunch with Team' },
-            { time: '15:00', description: 'Project Meeting' },
-            { time: '18:00', description: 'Gym Session' }
-        ]);
+    async function loadEntriesForDay(date: Date) {
+        const userId = 'd5ce285b-d7a9-454d-ad9b-67938e8cd860'; // Replace with actual user ID
+        const month = (date.getMonth() + 1).toString();
+        const year = date.getFullYear().toString();
+
+        try {
+            const response = await getJournalEntries({ userId, month, year });
+            const dayEntries = response.journals.filter(entry => entry.day === date.getDate().toString());
+            entries.set(dayEntries);
+        } catch (error) {
+            console.error('Error fetching journal entries:', error);
+        }
     }
 
     $: loadEntriesForDay(currentDate);

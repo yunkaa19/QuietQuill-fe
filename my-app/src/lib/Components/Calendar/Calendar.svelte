@@ -1,51 +1,146 @@
 <script lang="ts">
+    import { createEventDispatcher } from 'svelte';
     import { writable } from 'svelte/store';
-    import TodayView from '$lib/Components/Calendar/TodayView.svelte';
-    import WeeklyView from '$lib/Components/Calendar/WeeklyView.svelte';
-    import MonthlyView from '$lib/Components/Calendar/MonthlyView.svelte';
-    import { goto } from '$app/navigation';
+    import { getJournalEntries } from '$lib/Components/Api/Journal/GetJournalEntries';
+    import { user } from '$lib/stores/session';
+    import { getMonthGrid } from '$lib/Components/Calendar/calendarUtils';
 
-    let view = writable('monthly'); // 'today', 'weekly', 'monthly'
-    let currentDate = new Date();
+    export let currentDate = new Date();
 
-    function navigateToDetail(id: string) {
-        goto(`/journals/${id}`);
+    type DayInfo = { date: Date, isCurrentMonth: boolean, entryId?: string };
+    type WeekInfo = DayInfo[];
+
+    let monthGrid = writable<WeekInfo[]>([]);
+    let currentUser: any = null;
+
+    user.subscribe(value => {
+        currentUser = value;
+    });
+
+    const dispatch = createEventDispatcher<{ addEntryClick: Date; entryClick: string }>();
+
+    async function loadEntriesForMonth(date: Date) {
+        if (!currentUser) {
+            console.error('User not loaded');
+            return;
+        }
+
+        const userId = currentUser.UserId;
+        const month = (date.getMonth() + 1).toString();
+        const year = date.getFullYear().toString();
+
+        try {
+            const response = await getJournalEntries({ userId, month, year });
+            const monthEntries = getMonthGrid(date).map(week => week.map(day => {
+                const entry = response.journals.find(entry =>
+                    new Date(parseInt(entry.year), parseInt(entry.month) - 1, parseInt(entry.day)).toDateString() === day.date.toDateString()
+                );
+                return {
+                    ...day,
+                    entryId: entry ? entry.id : undefined
+                };
+            }));
+            monthGrid.set(monthEntries);
+        } catch (error) {
+            console.error('Error fetching journal entries:', error);
+        }
+    }
+
+    function debounce(func: (...args: any[]) => void, wait: number) {
+        let timeout: NodeJS.Timeout;
+        return function(this: any, ...args: any[]) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(this, args), wait);
+        };
+    }
+
+    const debouncedLoadEntriesForMonth = debounce(loadEntriesForMonth, 300);
+
+    $: debouncedLoadEntriesForMonth(currentDate);
+
+    function nextMonth() {
+        currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+        monthGrid.set(getMonthGrid(currentDate));
+        debouncedLoadEntriesForMonth(currentDate);
+    }
+
+    function prevMonth() {
+        currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+        monthGrid.set(getMonthGrid(currentDate));
+        debouncedLoadEntriesForMonth(currentDate);
+    }
+
+    function handleEntryClick(entryId: string | undefined) {
+        if (entryId) {
+            dispatch('entryClick', entryId);
+        }
+    }
+
+    function handleAddEntryClick(date: Date) {
+        console.log('Original date:', date);
+        // Normalize the date to UTC
+        const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        console.log('UTC date:', utcDate);
+        dispatch('addEntryClick', utcDate);
     }
 </script>
 
-<div class="calendar-container flex flex-col items-center justify-center w-full h-full bg-bgColor p-4 rounded-lg shadow-md">
-    <div class="calendar-controls flex justify-center space-x-4 mb-4">
-        <!-- Controls for switching views -->
-        <button class="bg-CTA px-4 py-2 text-white rounded hover:bg-CTA-Hover focus:outline-none focus:ring-2 focus:ring-CTA-Hover focus:ring-opacity-50" on:click={() => view.set('today')}>Today</button>
-        <button class="bg-CTA px-4 py-2 text-white rounded hover:bg-CTA-Hover focus:outline-none focus:ring-2 focus:ring-CTA-Hover focus:ring-opacity-50" on:click={() => view.set('weekly')}>Weekly</button>
-        <button class="bg-CTA px-4 py-2 text-white rounded hover:bg-CTA-Hover focus:outline-none focus:ring-2 focus:ring-CTA-Hover focus:ring-opacity-50" on:click={() => view.set('monthly')}>Monthly</button>
-    </div>
+<div class="flex items-center justify-between p-4 bg-bgColor text-textColor mb-4 rounded-lg shadow-md">
+    <button class="px-4 py-2 rounded bg-CTA hover:bg-CTA-Hover focus:outline-none focus:ring-2 focus:ring-CTA-Hover" on:click={prevMonth}>&lt;</button>
+    <span class="font-bold">{currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}</span>
+    <button class="px-4 py-2 rounded bg-CTA hover:bg-CTA-Hover focus:outline-none focus:ring-2 focus:ring-CTA-Hover" on:click={nextMonth}>&gt;</button>
+</div>
 
-    <div class="calendar-view w-full max-w-5xl transition-transform duration-300 ease-in-out">
-        {#if $view === 'today'}
-            <TodayView {currentDate} on:entryClick={event => navigateToDetail(event.detail)} />
-        {:else if $view === 'weekly'}
-            <WeeklyView {currentDate} on:entryClick={event => navigateToDetail(event.detail)} />
-        {:else if $view === 'monthly'}
-            <MonthlyView {currentDate} on:entryClick={event => navigateToDetail(event.detail)} />
-        {/if}
-    </div>
+<div class="calendar-grid w-full h-full">
+    {#each $monthGrid as week}
+        <div class="week">
+            {#each week as day}
+                <div class="day {day.isCurrentMonth ? 'current-month' : ''}">
+                    <span class="date">{day.date.getDate()}</span>
+                    <button class="absolute top-2 right-2 text-xs bg-CTA text-white px-2 py-1 rounded-full hover:bg-CTA-Hover" on:click={() => handleAddEntryClick(day.date)}>
+                        +
+                    </button>
+                    {#if day.isCurrentMonth && day.entryId}
+                        <button class="absolute top-2 left-2 text-xs bg-CTA text-white px-2 py-1 rounded-full hover:bg-CTA-Hover" on:click={() => handleEntryClick(day.entryId)}>
+                            View
+                        </button>
+                    {/if}
+                </div>
+            {/each}
+        </div>
+    {/each}
 </div>
 
 <style>
-    .calendar-container {
-        background-color: var(--bgColor);
-        padding: 2rem;
-        border-radius: 1rem;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1rem;
+        padding: 1rem;
     }
-    .calendar-controls {
-        margin-bottom: 1.5rem;
+    .week {
+        display: contents;
     }
-    .calendar-controls button {
-        min-width: 100px;
-    }
-    .calendar-view {
+    .day {
+        padding: 1rem;
+        background-color: #f0f0f0;
+        border-radius: 0.5rem;
+        text-align: center;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 100px;
         transition: transform 0.5s ease-in-out;
+    }
+    .day.current-month {
+        background-color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .date {
+        font-size: 0.875rem;
+        color: #2E5157;
+        font-weight: 500;
     }
 </style>
