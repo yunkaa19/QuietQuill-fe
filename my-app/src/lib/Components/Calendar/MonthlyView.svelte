@@ -1,23 +1,20 @@
 <script lang="ts">
-    import { createEventDispatcher } from 'svelte';
     import { writable } from 'svelte/store';
+    import { getMonthGrid } from '$lib/Components/Calendar/calendarUtils';
     import { getJournalEntries } from '$lib/Components/Api/Journal/GetJournalEntries';
     import { user } from '$lib/stores/session';
-    import { getMonthGrid } from '$lib/Components/Calendar/calendarUtils';
+    import { createEventDispatcher } from 'svelte';
 
     export let currentDate = new Date();
+    const monthGrid = writable([]);
 
-    type DayInfo = { date: Date, isCurrentMonth: boolean, entryId?: string };
-    type WeekInfo = DayInfo[];
-
-    let monthGrid = writable<WeekInfo[]>([]);
     let currentUser: any = null;
 
     user.subscribe(value => {
         currentUser = value;
     });
 
-    const dispatch = createEventDispatcher<{ addEntryClick: Date; entryClick: string }>();
+    const dispatch = createEventDispatcher();
 
     async function loadEntriesForMonth(date: Date) {
         if (!currentUser) {
@@ -77,9 +74,11 @@
     }
 
     function handleAddEntryClick(date: Date) {
-        // Set time components to zero to avoid time zone offset issues
-        const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
-        dispatch('addEntryClick', normalizedDate);
+        console.log('Original date:', date);
+        // Normalize the date to UTC
+        const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        console.log('UTC date:', utcDate);
+        dispatch('addEntryClick', utcDate);
     }
 </script>
 
