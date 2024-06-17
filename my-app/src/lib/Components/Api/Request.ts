@@ -57,6 +57,6 @@ export function put<T>(endpoint: string, data: any): Promise<T> {
     return request<T>(endpoint, 'PUT', data);
 }
 
-export function del<T>(endpoint: string): Promise<T> {
-    return request<T>(endpoint, 'DELETE');
+export function del<T>(endpoint: string, data: any): Promise<T> {
+    return request<T>(endpoint, 'DELETE', data);
 }
