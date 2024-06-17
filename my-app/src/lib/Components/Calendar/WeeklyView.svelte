@@ -8,6 +8,44 @@
     export let currentDate = new Date();
     const weekGrid = writable([]);
 
+    const moods = [
+        { value: 1, label: "HAPPY" },
+        { value: 2, label: "SAD" },
+        { value: 3, label: "ANGRY" },
+        { value: 4, label: "CALM" },
+        { value: 5, label: "ANXIOUS" },
+        { value: 6, label: "EXCITED" },
+        { value: 7, label: "BORED" },
+        { value: 8, label: "RELAXED" },
+        { value: 9, label: "GRATEFUL" },
+        { value: 10, label: "FRUSTRATED" },
+        { value: 11, label: "CONFUSED" },
+        { value: 12, label: "HOPEFUL" },
+        { value: 13, label: "INSPIRED" },
+        { value: 14, label: "NERVOUS" },
+        { value: 15, label: "LONELY" },
+        { value: 16, label: "SURPRISED" },
+        { value: 17, label: "TIRED" },
+        { value: 18, label: "STRESSED" },
+        { value: 19, label: "MOTIVATED" },
+        { value: 20, label: "ENERGETIC" },
+        { value: 21, label: "SCARED" },
+        { value: 22, label: "JEALOUS" },
+        { value: 23, label: "CONTENT" },
+        { value: 24, label: "MELANCHOLIC" },
+        { value: 25, label: "INDIFFERENT" },
+        { value: 26, label: "OVERWHELMED" },
+        { value: 27, label: "RELIEVED" },
+        { value: 28, label: "EMBARRASSED" },
+        { value: 29, label: "HOPELESS" },
+        { value: 30, label: "GUILTY" },
+        { value: 31, label: "PROUD" },
+        { value: 32, label: "AWKWARD" },
+        { value: 33, label: "LOVED" },
+        { value: 34, label: "PEACEFUL" },
+        { value: 35, label: "TRUSTING" }
+    ];
+
     let currentUser: any = null;
 
     user.subscribe(value => {
@@ -15,6 +53,11 @@
     });
 
     const dispatch = createEventDispatcher();
+
+    function getMoodLabel(value: number): string {
+        const mood = moods.find(m => m.value === value);
+        return mood ? mood.label : "UNKNOWN";
+    }
 
     async function loadEntriesForWeek(date: Date) {
         if (!currentUser) {
@@ -31,6 +74,11 @@
             const weekEntries = getWeekGrid(date).map(day => ({
                 ...day,
                 entries: response.journals.filter(entry => new Date(entry.year, entry.month - 1, entry.day).toDateString() === day.date.toDateString())
+                    .map(entry => ({
+                        id: entry.id,
+                        mood: getMoodLabel(entry.mood),
+                        tags: entry.tags
+                    }))
             }));
             weekGrid.set(weekEntries);
         } catch (error) {
@@ -51,11 +99,16 @@
     }
 
     function handleEntryClick(entryId: string) {
-        dispatch('entryClick', entryId);
+        // Navigate to view entry page with query parameter
+        window.location.href = `/journals/journal_page/view?e=${entryId}`;
     }
 
     function handleAddEntryClick(date: Date) {
         dispatch('addEntryClick', date);
+    }
+
+    function getDayName(date: Date): string {
+        return date.toLocaleString('default', { weekday: 'long' });
     }
 </script>
 
@@ -71,18 +124,25 @@
 <div class="week-grid grid grid-cols-7 gap-4 p-4">
     {#each $weekGrid as day}
         <div class="day p-4 bg-white rounded-lg shadow-md">
-            <span class="date font-bold">{day.date.toLocaleDateString()}</span>
-            <button class="absolute top-2 right-2 text-xs bg-CTA text-white px-2 py-1 rounded-full hover:bg-CTA-Hover" on:click={() => handleAddEntryClick(day.date)}>
-                +
-            </button>
-            {#each day.entries as entry}
-                <div class="entry p-2 bg-gray-100 rounded-lg mb-2">
-                    <span class="time font-bold">{entry.time}</span> - <span class="description">{entry.description}</span>
-                    <button class="text-xs bg-CTA text-white px-2 py-1 rounded-full hover:bg-CTA-Hover" on:click={() => handleEntryClick(entry.id)}>
-                        View
-                    </button>
-                </div>
-            {/each}
+            <div class="header flex justify-between w-full mb-2">
+                <span class="date font-bold">{getDayName(day.date)}</span>
+                <button class="text-xs bg-CTA text-white px-2 py-1 rounded-full hover:bg-CTA-Hover" on:click={() => handleAddEntryClick(day.date)}>
+                    +
+                </button>
+            </div>
+            <div class="entries-container overflow-y-auto max-h-32">
+                {#each day.entries as entry}
+                    <div class="entry p-2 bg-gray-100 rounded-lg mb-2">
+                        <span class="mood font-bold">Mood: {entry.mood}</span>
+                        {#if entry.tags}
+                            - <span class="tags">Tags: {entry.tags}</span>
+                        {/if}
+                        <button class="text-xs bg-CTA text-white px-2 py-1 rounded-full hover:bg-CTA-Hover" on:click={() => handleEntryClick(entry.id)}>
+                            View
+                        </button>
+                    </div>
+                {/each}
+            </div>
         </div>
     {/each}
 </div>
@@ -101,18 +161,37 @@
         position: relative;
         display: flex;
         flex-direction: column;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
-        height: 100px;
+        height: 200px; /* Adjust the height as needed */
         transition: transform 0.5s ease-in-out;
     }
     .date {
         font-weight: bold;
+    }
+    .header {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .entries-container {
+        width: 100%;
+        overflow-y: auto;
     }
     .entry {
         margin-top: 0.5rem;
         padding: 0.5rem;
         background-color: #f0f0f0;
         border-radius: 0.25rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .mood {
+        font-weight: bold;
+    }
+    .tags {
+        font-style: italic;
     }
 </style>

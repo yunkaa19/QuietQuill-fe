@@ -1,24 +1,39 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
+    import { writable } from 'svelte/store';
+    import { fetchAndMapEntries } from './apiHelper'; // Adjust the path as necessary
     import MonthlyView from './MonthlyView.svelte';
     import WeeklyView from './WeeklyView.svelte';
     import TodayView from './TodayView.svelte';
 
     export let currentDate = new Date();
+    export let currentUser: any;
     let view: 'daily' | 'weekly' | 'monthly' = 'monthly';
+    let selectedDate = new Date();
 
     const dispatch = createEventDispatcher();
+    let monthGrid = writable([]);
 
-    function switchView(newView: 'daily' | 'weekly' | 'monthly') {
+    // Fetch data whenever currentUser or currentDate changes
+    $: if (currentUser) {
+        fetchAndMapEntries(currentUser, currentDate, monthGrid);
+    }
+
+    function switchView(newView: 'daily' | 'weekly' | 'monthly', date: Date = new Date()) {
         view = newView;
+        selectedDate = date;
     }
 
     function handleAddEntryClick(event: CustomEvent<Date>) {
         dispatch('addEntryClick', event.detail);
     }
 
-    function handleEntryClick(event: CustomEvent<string>) {
-        dispatch('entryClick', event.detail);
+    function handleEntryClick(event: CustomEvent<{ date: Date, entries: any[] }>) {
+        if (event.detail.entries.length > 1) {
+            switchView('daily', event.detail.date);
+        } else {
+            dispatch('entryClick', event.detail.entries[0].id);
+        }
     }
 </script>
 
@@ -29,7 +44,7 @@
 </div>
 
 {#if view === 'monthly'}
-    <MonthlyView {currentDate} on:addEntryClick={handleAddEntryClick} on:entryClick={handleEntryClick} />
+    <MonthlyView {currentDate} {monthGrid} on:addEntryClick={handleAddEntryClick} on:entryClick={handleEntryClick} />
 {/if}
 
 {#if view === 'weekly'}
@@ -37,7 +52,7 @@
 {/if}
 
 {#if view === 'daily'}
-    <TodayView {currentDate} on:addEntryClick={handleAddEntryClick} on:entryClick={handleEntryClick} />
+    <TodayView {currentDate} {selectedDate} on:addEntryClick={handleAddEntryClick} on:entryClick={handleEntryClick} />
 {/if}
 
 <style>
@@ -45,36 +60,5 @@
         display: flex;
         gap: 1rem;
         margin-bottom: 1rem;
-    }
-    .calendar-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 1rem;
-        padding: 1rem;
-    }
-    .week {
-        display: contents;
-    }
-    .day {
-        padding: 1rem;
-        background-color: #f0f0f0;
-        border-radius: 0.5rem;
-        text-align: center;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        height: 100px;
-        transition: transform 0.5s ease-in-out;
-    }
-    .day.current-month {
-        background-color: #ffffff;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-    .date {
-        font-size: 0.875rem;
-        color: #2E5157;
-        font-weight: 500;
     }
 </style>

@@ -12,7 +12,9 @@ export default {
       'textColor': '#F4FBF8',
       'CTA':'#2E5157',
       'CTA-Hover':'#778E91',
-      'Card-Background' : '#31565E'
+      'Card-Background' : '#31565E',
+      'red' : '#FF0000',
+      
           
     },
     extend: {},

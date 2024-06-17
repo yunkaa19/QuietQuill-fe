@@ -1,12 +1,13 @@
 <script lang="ts">
+    import { createEventDispatcher } from 'svelte';
     import { writable } from 'svelte/store';
     import { getMonthGrid } from '$lib/Components/Calendar/calendarUtils';
     import { getJournalEntries } from '$lib/Components/Api/Journal/GetJournalEntries';
     import { user } from '$lib/stores/session';
-    import { createEventDispatcher } from 'svelte';
+    import type { Writable } from 'svelte/store';
 
-    export let currentDate = new Date();
-    const monthGrid = writable([]);
+    export let currentDate: Date = new Date();
+    const monthGrid: Writable<any[]> = writable([]);
 
     let currentUser: any = null;
 
@@ -29,12 +30,12 @@
         try {
             const response = await getJournalEntries({ userId, month, year });
             const monthEntries = getMonthGrid(date).map(week => week.map(day => {
-                const entry = response.journals.find(entry =>
+                const entries = response.journals.filter(entry =>
                     new Date(parseInt(entry.year), parseInt(entry.month) - 1, parseInt(entry.day)).toDateString() === day.date.toDateString()
                 );
                 return {
                     ...day,
-                    entryId: entry ? entry.id : undefined
+                    entries: entries.length ? entries : undefined
                 };
             }));
             monthGrid.set(monthEntries);
@@ -43,42 +44,33 @@
         }
     }
 
-    function debounce(func: (...args: any[]) => void, wait: number) {
-        let timeout: NodeJS.Timeout;
-        return function(this: any, ...args: any[]) {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func.apply(this, args), wait);
-        };
-    }
+    $: loadEntriesForMonth(currentDate);
 
-    const debouncedLoadEntriesForMonth = debounce(loadEntriesForMonth, 300);
-
-    $: debouncedLoadEntriesForMonth(currentDate);
-
-    function nextMonth() {
-        currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
-        monthGrid.set(getMonthGrid(currentDate));
-        debouncedLoadEntriesForMonth(currentDate);
-    }
-
-    function prevMonth() {
-        currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
-        monthGrid.set(getMonthGrid(currentDate));
-        debouncedLoadEntriesForMonth(currentDate);
-    }
-
-    function handleEntryClick(entryId: string | undefined) {
-        if (entryId) {
-            dispatch('entryClick', entryId);
+    function handleEntryClick(date: Date, entries: any[]) {
+        if (entries.length === 1) {
+            // Navigate to view entry page with query parameter if there's only one entry
+            window.location.href = `/journals/journal_page/view?e=${entries[0].id}`;
+        } else if (entries.length > 1) {
+            // Dispatch event if there are multiple entries
+            dispatch('entryClick', { date, entries });
         }
     }
 
     function handleAddEntryClick(date: Date) {
         console.log('Original date:', date);
-        // Normalize the date to UTC
         const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
         console.log('UTC date:', utcDate);
         dispatch('addEntryClick', utcDate);
+    }
+
+    function nextMonth() {
+        currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+        loadEntriesForMonth(currentDate);
+    }
+
+    function prevMonth() {
+        currentDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1);
+        loadEntriesForMonth(currentDate);
     }
 </script>
 
@@ -97,8 +89,8 @@
                     <button class="absolute top-2 right-2 text-xs bg-CTA text-white px-2 py-1 rounded-full hover:bg-CTA-Hover" on:click={() => handleAddEntryClick(day.date)}>
                         +
                     </button>
-                    {#if day.isCurrentMonth && day.entryId}
-                        <button class="absolute top-2 left-2 text-xs bg-CTA text-white px-2 py-1 rounded-full hover:bg-CTA-Hover" on:click={() => handleEntryClick(day.entryId)}>
+                    {#if day.isCurrentMonth && day.entries}
+                        <button class="absolute top-2 left-2 text-xs bg-CTA text-white px-2 py-1 rounded-full hover:bg-CTA-Hover" on:click={() => handleEntryClick(day.date, day.entries)}>
                             View
                         </button>
                     {/if}
