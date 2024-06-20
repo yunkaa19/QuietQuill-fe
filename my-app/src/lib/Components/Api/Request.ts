@@ -1,6 +1,7 @@
 import { user } from "$lib/stores/session";
 
-const BASE_URL = 'http://localhost:5103'; // TODO: Adjust this
+const BASE_URL = 'localhost:8080';
+//const BASE_URL = 'http://localhost:5103'; // TODO: Adjust this
 
 interface RequestOptions {
     method: string;
