@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { loggedIn } from '$lib/stores/session';
+    import { showModal } from '$lib/stores/modal';
 
     let isSidebarExpanded = false;
     let isLoggedIn: boolean;
@@ -14,12 +15,16 @@
     function navigateTo(route: string) {
         goto("/" + route);
     }
+
+    function openPaperPlaneModal() {
+        showModal.set(true);
+    }
 </script>
 
 <!-- Sidebar Container -->
 <div class={`fixed top-0 left-0 h-full z-40 flex flex-col bg-bgColor transition-all duration-300 ${isSidebarExpanded ? 'w-64' : 'w-16'}`}>
     <!-- Toggle Button -->
-    <button class="mt-4 ml-auto mr-2" on:click={toggleSidebar}>
+    <button class="mt-4 ml-auto mr-2" on:click={toggleSidebar} data-cy="expand">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-6 h-6 transform transition-transform duration-300"
              style:transform={isSidebarExpanded ? 'rotate(180deg)' : 'rotate(0deg)'} stroke-width="1.5" stroke="white" fill="none">
             <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
@@ -69,13 +74,11 @@
             </button>
 
             <!-- Paperplane button -->
-            
-            <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={() => navigateTo("paperplane")}>
 
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6 " style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
+            <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={openPaperPlaneModal}>
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6" style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
                 </svg>
-
                 <span class={isSidebarExpanded ? 'text-white text-lg' : 'text-white text-xl hidden'}>Paper plane</span>
             </button>
             
@@ -128,7 +131,7 @@
             </button>
         {:else}
             <!-- Log In Button -->
-            <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" on:click={() => navigateTo("login")}>
+            <button class="flex justify-center items-center w-full h-12 px-4 py-2 hover:bg-CTA-Hover transition-colors duration-300" data-cy="login" on:click={() => navigateTo("login")}>
                 <!-- Log In Icon -->
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="white" class="w-6 h-6" style:transform={isSidebarExpanded ? 'scale(1)' : 'scale(2)'}>
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
