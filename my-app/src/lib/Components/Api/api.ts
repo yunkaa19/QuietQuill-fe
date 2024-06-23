@@ -1,5 +1,5 @@
 //const BASE_URL = 'localhost:5103'; //TODO: Adjust this
-const BASE_URL = 'localhost:8080';
+const BASE_URL = 'quietquillapi:8080';
 interface RequestOptions {
     method: string;
     headers: Headers;
