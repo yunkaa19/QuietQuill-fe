@@ -53,11 +53,11 @@
                 <input class="w-full p-4 text-lg text-bgColor text-gray-700 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                        bind:value={password} type="password" placeholder="Password" required />
                 <ul class="list-disc ml-4 text-sm">
-                    <li class={password.length >= 8 ? 'text-green-500' : 'text-red-500'}>At least 8 characters</li>
-                    <li class={hasUpperCase ? 'text-green-500' : 'text-red-500'}>At least one uppercase letter</li>
-                    <li class={hasLowerCase ? 'text-green-500' : 'text-red-500'}>At least one lowercase letter</li>
-                    <li class={hasNumber ? 'text-green-500' : 'text-red-500'}>At least one number</li>
-                    <li class={hasSpecialChar ? 'text-green-500' : 'text-red-500'}>At least one special character</li>
+                    <li class={password.length >= 8 ? 'text-green' : 'text-red'}>At least 8 characters</li>
+                    <li class={hasUpperCase ? 'text-green' : 'text-red'}>At least one uppercase letter</li>
+                    <li class={hasLowerCase ? 'text-green' : 'text-red'}>At least one lowercase letter</li>
+                    <li class={hasNumber ? 'text-green' : 'text-red'}>At least one number</li>
+                    <li class={hasSpecialChar ? 'text-green' : 'text-red'}>At least one special character</li>
                 </ul>
             </div>
 

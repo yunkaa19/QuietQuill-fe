@@ -14,10 +14,11 @@
         <div class="features space-y-4">
             <h2 class="text-3xl font-semibold">Features</h2>
             <ul class="list-disc list-inside space-y-2">
-                <li>Daily Mental Health Tracking</li>
-                <li>Personalized Wellness Plans</li>
-                <li>Connect with Therapists</li>
-                <li>Community Support Forums</li>
+                <li>Journaling</li>
+                <li>Habit tracking</li>
+                <li>Meditation</li>
+                <li>Community support</li>
+                <li>And more...</li>
             </ul>
         </div>
 

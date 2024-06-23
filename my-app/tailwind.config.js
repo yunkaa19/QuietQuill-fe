@@ -14,7 +14,7 @@ export default {
       'CTA-Hover':'#778E91',
       'Card-Background' : '#31565E',
       'red' : '#FF0000',
-      
+      'green' : '#00FF00',
           
     },
     extend: {},

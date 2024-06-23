@@ -10,35 +10,42 @@ interface Message {
 export const socket = writable<WebSocket | null>(null);
 export const messages = writable<{ id: string, content: string }[]>([]);
 
-export function connectWebSocket(url: string) {
-    const user = getToken();
-    const token = user ? user.Token : '';
+export function connectWebSocket(url: string, reconnectDelay = 5000) {
+    const connect = () => {
+        const user = getToken();
+        const token = user ? user.Token : '';
 
-    // Modify the URL to include the token as a query parameter
-    const wsUrl = `${url}?token=${token}`;
+        // Modify the URL to include the token as a query parameter
+        const wsUrl = `${url}?token=${token}`;
 
-    const ws = new WebSocket(wsUrl);
+        const ws = new WebSocket(wsUrl);
 
-    ws.onopen = () => {
-        console.log('WebSocket connection opened');
-        socket.set(ws);
+        ws.onopen = () => {
+            console.log('WebSocket connection opened');
+            socket.set(ws);
+        };
+
+        ws.onmessage = (event) => {
+            console.log('WebSocket message received:', event.data);
+            const message: Message = JSON.parse(event.data);
+            showMessage(message.Content);
+            messages.update(msgs => [...msgs, { id: generateUniqueId(), content: message.Content }]);
+        };
+
+        ws.onclose = () => {
+            console.log('WebSocket connection closed');
+            socket.set(null);
+            // Try to reconnect after a specified delay
+            setTimeout(connect, reconnectDelay);
+        };
+
+        ws.onerror = (error) => {
+            console.error('WebSocket error:', error);
+            ws.close(); // Ensure the connection is closed properly
+        };
     };
 
-    ws.onmessage = (event) => {
-        console.log('WebSocket message received:', event.data);
-        const message: Message = JSON.parse(event.data);
-        showMessage(message.Content);
-        messages.update((msgs) => [...msgs, { id: generateUniqueId(), content: message.Content }]);
-    };
-
-    ws.onclose = () => {
-        console.log('WebSocket connection closed');
-        socket.set(null);
-    };
-
-    ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
-    };
+    connect(); // Initial connection
 }
 
 export function sendMessage(content: string) {
