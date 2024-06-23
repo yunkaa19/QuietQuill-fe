@@ -2,8 +2,8 @@
     import '../global.css';
     import Navbar from '$lib/nav.svelte';
     import Modal from '$lib/Components/PaperPlane/Modal.svelte';
-    import Notification from '$lib/components/Notification.svelte';
-    import { showModal } from '$lib/stores/modal';
+    import Notification from '$lib/Components/Notification.svelte';
+    import { showModal } from '$lib/stores/Modal';
     import { notifications } from '$lib/stores/notifications';
     import { sendMessage, connectWebSocket } from '$lib/stores/PaperPlane';
     import { onMount } from 'svelte';
