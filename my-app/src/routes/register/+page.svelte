@@ -1,17 +1,18 @@
 <script lang="ts">
-    import { register } from '$lib/Components/Api/User/register'; 
+    import { register } from '$lib/Components/Api/User/register'; // Make sure the import path is correct
 
     let email: string = '';
     let password: string = '';
+    let registrationError: string = ''; // To display registration errors
 
     async function registerWithEmail() {
         try {
-            const userData = await register({ email, password });
-            console.log('Registration successful:', userData);
-            // Optionally redirect to login or another page on successful registration
+            const userId = await register({ email, password });
+            console.log('Registration successful, User ID:', userId);
+            // Optionally redirect to login or dashboard page here
         } catch (error) {
             console.error('Registration failed:', error);
-            // Optionally handle UI feedback for registration failure
+            registrationError = 'Failed to register. Please try again.'; // Update UI to show error
         }
     }
 </script>
@@ -24,6 +25,7 @@
                    bind:value={email} type="email" placeholder="Email" required />
             <input class="w-full p-4 text-lg text-bgColor text-gray-700 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                    bind:value={password} type="password" placeholder="Password" required />
+            <p class="text-red-500">{registrationError}</p>  <!-- Display errors -->
             <button class="w-full p-4 text-lg font-semibold text-white bg-CTA rounded-md hover:bg-CTA-Hover"
                     type="submit">Register</button>
         </form>
