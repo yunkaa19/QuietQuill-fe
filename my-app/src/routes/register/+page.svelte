@@ -4,22 +4,23 @@
 
     let email: string = '';
     let password: string = '';
-    let registrationError: string = ''; // For displaying registration errors
+    let registrationError: string = '';
 
     async function registerWithEmail() {
+        registrationError = ''; // Reset errors on new submission
         try {
             const { identityID } = await register({ email, password });
             console.log('Registration successful, Identity ID:', identityID);
-            await goto('/login'); // Redirect to the login page on successful registration
+            await goto('/login');
         } catch (error) {
             console.error('Registration failed:', error);
-            registrationError = 'Failed to register. Please try again.'; // Update UI to show error
+            registrationError = error.message; // Display detailed error messages
         }
     }
 </script>
 
 
-<div class="flex flex-col items-center justify-center min-h-screen bg-bgColor text-textColor">
+<div class="flex flex-col items-center justify-center min-h-screen bg-bgColor text-textColor"><div class="flex flex-col items-center justify-center min-h-screen bg-bgColor text-textColor">
     <h1 class="mb-8 text-4xl font-bold">Register</h1>
     <div class="w-full max-w-sm p-8 space-y-8 bg-white rounded-lg shadow-md">
         <form class="space-y-6" on:submit|preventDefault={registerWithEmail}>
@@ -27,7 +28,9 @@
                    bind:value={email} type="email" placeholder="Email" required />
             <input class="w-full p-4 text-lg text-bgColor text-gray-700 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                    bind:value={password} type="password" placeholder="Password" required />
-            <p class="text-red">{registrationError}</p>  <!-- Display errors -->
+            {#if registrationError}
+                <p class="text-red-500">{registrationError}</p>
+            {/if}
             <button class="w-full p-4 text-lg font-semibold text-white bg-CTA rounded-md hover:bg-CTA-Hover"
                     type="submit">Register</button>
         </form>

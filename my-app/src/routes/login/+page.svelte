@@ -33,7 +33,7 @@
                     type="submit">Login</button>
         </form>
         {#if $errorMessage}
-            <p class="text-red-500 text-sm">{$errorMessage}</p>
+            <p class="text-red text-sm">{$errorMessage}</p>
         {/if}
         <div class="text-sm text-center text-bgColor">or</div>
         <div class="text-center text-bgColor">
