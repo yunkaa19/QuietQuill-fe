@@ -1,6 +1,6 @@
 import { user } from "$lib/stores/session";
 
-const BASE_URL = 'quietquillapi:8080';
+const BASE_URL = 'http://localhost:8080';
 //const BASE_URL = 'http://localhost:5103'; // TODO: Adjust this
 
 interface RequestOptions {
