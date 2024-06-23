@@ -40,7 +40,7 @@
             <p class="text-lg">Our team is just one person who wants the world to heal</p>
             <div class="flex justify-center space-x-8">
                 <div>
-                    <img src="src/lib/images/team-member-1.jpg" alt="Team Member 1" class="w-32 h-32 rounded-full mx-auto">
+                    <img src="images/team-member-1.jpg" alt="Team Member 1" class="w-32 h-32 rounded-full mx-auto">
                     <p class="mt-2">Yunuz Yunuz</p>
                     <p class="text-sm">Developer and Maintainer</p>
                 </div>

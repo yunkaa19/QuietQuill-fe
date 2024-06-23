@@ -34,7 +34,7 @@
         <div class="text-sm text-center text-bgColor">or</div>
         <button class="text-bgColor flex items-center justify-center w-full p-4 font-semibold text-gray-700 bg-white rounded-md shadow hover:shadow-md"
                 on:click={registerWithEmail}>
-            <img src="src/lib/images/google.svg" alt="Google logo" class="w-6 h-6 mr-3">
+            <img src="images/google.svg" alt="Google logo" class="w-6 h-6 mr-3">
             Register with Google
         </button>
         <div class="text-center text-bgColor">

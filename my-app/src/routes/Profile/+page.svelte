@@ -93,7 +93,7 @@
         <div class="max-w-4xl w-full bg-Card-Background p-8 rounded-lg space-y-8">
             <!-- User Info -->
             <section class="flex items-center space-x-6">
-                <img src="src/lib/images/default-avatar.png" alt="User Avatar" class="w-24 h-24 rounded-full">
+                <img src="images/default-avatar.png" alt="User Avatar" class="w-24 h-24 rounded-full">
                 <div>
                     <h1 class="text-3xl font-bold">{currentUser.Username || 'Anonymous'}</h1>
                     <p class="text-lg">{currentUser.Email}</p>
