@@ -1,21 +1,23 @@
 <script lang="ts">
-    import { register } from '$lib/Components/Api/User/register'; // Make sure the import path is correct
+    import { register } from '$lib/Components/Api/User/register';
+    import { goto } from '$app/navigation';
 
     let email: string = '';
     let password: string = '';
-    let registrationError: string = ''; // To display registration errors
+    let registrationError: string = ''; // For displaying registration errors
 
     async function registerWithEmail() {
         try {
-            const userId = await register({ email, password });
-            console.log('Registration successful, User ID:', userId);
-            // Optionally redirect to login or dashboard page here
+            const { identityID } = await register({ email, password });
+            console.log('Registration successful, Identity ID:', identityID);
+            await goto('/login'); // Redirect to the login page on successful registration
         } catch (error) {
             console.error('Registration failed:', error);
             registrationError = 'Failed to register. Please try again.'; // Update UI to show error
         }
     }
 </script>
+
 
 <div class="flex flex-col items-center justify-center min-h-screen bg-bgColor text-textColor">
     <h1 class="mb-8 text-4xl font-bold">Register</h1>
@@ -25,7 +27,7 @@
                    bind:value={email} type="email" placeholder="Email" required />
             <input class="w-full p-4 text-lg text-bgColor text-gray-700 border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                    bind:value={password} type="password" placeholder="Password" required />
-            <p class="text-red-500">{registrationError}</p>  <!-- Display errors -->
+            <p class="text-red">{registrationError}</p>  <!-- Display errors -->
             <button class="w-full p-4 text-lg font-semibold text-white bg-CTA rounded-md hover:bg-CTA-Hover"
                     type="submit">Register</button>
         </form>
