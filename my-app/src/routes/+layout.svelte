@@ -19,8 +19,8 @@
     }
 
     onMount(() => {
-        //connectWebSocket('ws://localhost:5103/ws'); //TODO: Adjust this to production later
-        connectWebSocket('ws://localhost:8080/ws');
+        connectWebSocket('ws://localhost:5103/ws'); //TODO: Adjust this to production later
+        //connectWebSocket('ws://localhost:8080/ws');
     });
 </script>
 
