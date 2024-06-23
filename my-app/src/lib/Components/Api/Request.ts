@@ -46,8 +46,8 @@ export async function request<T>(endpoint: string, method: string, data?: any, r
     }
 }
 
-export function get<T>(endpoint: string): Promise<T> {
-    return request<T>(endpoint, 'GET');
+export function get<T>(endpoint: string, data: any): Promise<T> {
+    return request<T>(endpoint, 'GET', data);
 }
 
 export function post<T>(endpoint: string, data: any, rawResponse: boolean = false): Promise<T> {

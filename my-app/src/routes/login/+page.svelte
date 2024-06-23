@@ -1,7 +1,7 @@
 <script lang="ts">
     import { writable } from 'svelte/store';
     import { goto } from '$app/navigation';
-    import { login } from '$lib/Components/Api/Users/login';
+    import { login } from '$lib/Components/Api/User/login';
     import { user } from '$lib/stores/session';
 
     let email: string = '';
