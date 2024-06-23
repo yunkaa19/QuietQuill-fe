@@ -1,7 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { loggedIn } from '$lib/stores/session';
-    import { showModal } from '$lib/stores/modal';
+    import { showModal } from '$lib/stores/Modal';
 
     let isSidebarExpanded = false;
     let isLoggedIn: boolean;
