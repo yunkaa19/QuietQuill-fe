@@ -1,14 +1,19 @@
 <script lang="ts">
-    
+    import { register } from '$lib/Components/Api/User/register'; 
 
     let email: string = '';
     let password: string = '';
 
     async function registerWithEmail() {
-        
+        try {
+            const userData = await register({ email, password });
+            console.log('Registration successful:', userData);
+            // Optionally redirect to login or another page on successful registration
+        } catch (error) {
+            console.error('Registration failed:', error);
+            // Optionally handle UI feedback for registration failure
+        }
     }
-
-    
 </script>
 
 <div class="flex flex-col items-center justify-center min-h-screen bg-bgColor text-textColor">
